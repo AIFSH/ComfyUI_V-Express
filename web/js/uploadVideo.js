@@ -193,7 +193,7 @@ function videoUpload(node, inputName, inputData, app) {
 ComfyWidgets.VIDEOPLOAD = videoUpload;
 
 app.registerExtension({
-	name: "MuseTalk.UploadVideo",
+	name: "V-Express.UploadVideo",
 	async beforeRegisterNodeDef(nodeType, nodeData, app) {
 		if (nodeData?.name == "LoadVideo") {
 			nodeData.input.required.upload = ["VIDEOPLOAD"];
