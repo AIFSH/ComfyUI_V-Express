@@ -30,7 +30,7 @@ You can also download [model_ckpts](https://huggingface.co/tk93/V-Express) manua
 
 
 ## Tutorial
-- [Demo]()
+- [Demo](https://www.bilibili.com/video/BV1Br421L7rX)
 
 ## WeChat Group && Donate
 <div>
