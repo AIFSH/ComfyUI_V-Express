@@ -123,9 +123,27 @@ class VExpress:
         --num_pad_audio_frames {num_pad_audio_frames} --standard_audio_sampling_rate {standard_audio_sampling_rate} --reference_image_path {ref_img} --audio_path {audio} --kps_path {kps_path} \
         --output_path {output_path} --image_width {image_width} --image_height {image_height} --fps {fps} --seed {seed} --num_inference_steps {num_inference_steps} --guidance_scale {guidance_scale} \
         --context_frames {context_frames} --context_stride {context_stride} --context_overlap {context_overlap} --reference_attention_weight {reference_attention_weight} --audio_attention_weight {audio_attention_weight}"
-
+        print(vexprss_cmd)
         os.system(vexprss_cmd)
         return (output_path,)
+
+
+class LoadImagePath:
+    @classmethod
+    def INPUT_TYPES(s):
+        input_dir = folder_paths.get_input_directory()
+        files = [f for f in os.listdir(input_dir) if os.path.isfile(os.path.join(input_dir, f))]
+        return {"required":
+                    {"image": (sorted(files), {"image_upload": True})},
+                }
+
+    CATEGORY = "AIFSH_VExpress"
+
+    RETURN_TYPES = ("IMAGE",)
+    FUNCTION = "load_image"
+    def load_image(self, image):
+        image_path = folder_paths.get_annotated_filepath(image)
+        return (image_path,)
     
 class CombineAudioVideo:
     @classmethod

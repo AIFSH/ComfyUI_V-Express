@@ -18,7 +18,8 @@ from modules import UNet2DConditionModel, UNet3DConditionModel, VKpsGuider, Audi
 from pipelines import VExpressPipeline
 from pipelines.utils import draw_kps_image, save_video
 from pipelines.utils import retarget_kps
-
+now_dir = os.path.dirname(os.path.abspath(__file__))
+inference_config_path = os.path.join(now_dir,"inference_v2.yaml")
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -73,7 +74,7 @@ def load_reference_net(unet_config_path, reference_net_path, dtype, device):
 
 
 def load_denoising_unet(unet_config_path, denoising_unet_path, motion_module_path, dtype, device):
-    inference_config_path = './inference_v2.yaml'
+    # inference_config_path = './inference_v2.yaml'
     inference_config = OmegaConf.load(inference_config_path)
     denoising_unet = UNet3DConditionModel.from_config_2d(
         unet_config_path,
@@ -122,7 +123,7 @@ def load_audio_projection(
 
 
 def get_scheduler():
-    inference_config_path = './inference_v2.yaml'
+    # inference_config_path = './inference_v2.yaml'
     inference_config = OmegaConf.load(inference_config_path)
     scheduler_kwargs = OmegaConf.to_container(inference_config.noise_scheduler_kwargs)
     scheduler = DDIMScheduler(**scheduler_kwargs)

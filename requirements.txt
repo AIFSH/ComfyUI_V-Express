@@ -1,3 +1,5 @@
+diffusers==0.24.0
+av
 pydub
 moviepy
 imageio-ffmpeg
