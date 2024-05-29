@@ -1,0 +1,9 @@
+pydub
+moviepy
+imageio-ffmpeg
+onnxruntime-gpu
+einops
+insightface
+omegaconf
+safetensors
+tqdm
