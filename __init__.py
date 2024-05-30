@@ -13,7 +13,7 @@ for site_packages_root in site_packages_roots:
         try:
             with open("%s/VExpress.pth" % (site_packages_root), "w") as f:
                 f.write(
-                    "%s\n%s/VExpress\n"
+                    "%s\n%s/V_Express\n"
                     % (now_dir,now_dir)
                 )
             break
@@ -28,15 +28,16 @@ if os.path.isfile("%s/VExpress.pth" % (site_packages_root)):
 
 from huggingface_hub import snapshot_download
 if not os.path.isfile(os.path.join(now_dir,"model_ckpts","v-express","v_kps_guider.pth")):
-    snapshot_download(repo_id="tk93/V-Express",local_dir=now_dir)
+    snapshot_download(repo_id="tk93/V-Express",local_dir=now_dir,allow_patterns=["*.onnx", "*.json","*.pth"])
 else:
     print("V-Express use cache models,make sure your 'model_ckpts' complete")
 
-from .nodes import LoadVideo,PreViewVideo,CombineAudioVideo,VExpress,LoadImagePath
+from .nodes import LoadVideo,PreViewVideo,CombineAudioVideo,VExpress,LoadImagePath, LoadAudio
 WEB_DIRECTORY = "./web"
 # A dictionary that contains all nodes you want to export with their names
 # NOTE: names should be globally unique
 NODE_CLASS_MAPPINGS = {
+    "LoadAudio": LoadAudio,
     "LoadVideo": LoadVideo,
     "PreViewVideo": PreViewVideo,
     "CombineAudioVideo": CombineAudioVideo,
@@ -50,5 +51,6 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "LoadVideo": "Video Loader",
     "PreViewVideo": "PreView Video",
     "CombineAudioVideo": "Combine Audio Video",
-    "LoadImagePath": "LoadImagePath"
+    "LoadImagePath": "LoadImagePath",
+    "LoadAudio": "AudioLoader"
 }

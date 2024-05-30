@@ -212,7 +212,7 @@ def main():
     video_length = int(duration * args.fps)
     print(f'The corresponding video length is {video_length}.')
 
-    if args.kps_path != "":
+    if args.kps_path != "None":
         assert os.path.exists(args.kps_path), f'{args.kps_path} does not exist'
         kps_sequence = torch.tensor(torch.load(args.kps_path))  # [len, 3, 2]
         print(f'The original length of kps sequence is {kps_sequence.shape[0]}.')

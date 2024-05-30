@@ -2,6 +2,7 @@ import os
 import sys
 import time
 import folder_paths
+import V_Express
 from pydub import AudioSegment
 from moviepy.editor import VideoFileClip,AudioFileClip
 from imageio_ffmpeg import get_ffmpeg_exe
@@ -103,9 +104,9 @@ class VExpress:
                 gpu_id,dtype,num_pad_audio_frames,standard_audio_sampling_rate,
                 image_width,image_height,fps,seed,num_inference_steps,guidance_scale,
                 context_frames,context_stride,context_overlap,reference_attention_weight,
-               audio_attention_weight,target_video):
+               audio_attention_weight,target_video=None):
         python_exec = sys.executable or "python"
-        parent_directory = os.path.join(now_dir,"V-Express")
+        parent_directory = os.path.join(now_dir,"V_Express")
         # todo autoclip image and video to 512
         
         if target_video:
@@ -115,18 +116,34 @@ class VExpress:
             --audio_save_path {audio_save_path} --device {device} --gpu_id {gpu_id} --insightface_model_path {insightface_model_path} --height {image_height} --width {image_width}"
             os.system(fps_cmd)
         else:
-            kps_path = ""
+            kps_path = None
         
         vexprss_cmd = f"{python_exec} {parent_directory}/inference.py --unet_config_path {unet_config_path} --vae_path {vae_path} --audio_encoder_path {audio_encoder_path} \
         --insightface_model_path {insightface_model_path} --denoising_unet_path {denoising_unet_path} --reference_net_path {reference_net_path} --v_kps_guider_path {v_kps_guider_path} \
         --audio_projection_path {audio_projection_path} --motion_module_path {motion_module_path} --retarget_strategy {retarget_strategy} --device {device} --gpu_id {gpu_id} --dtype {dtype} \
-        --num_pad_audio_frames {num_pad_audio_frames} --standard_audio_sampling_rate {standard_audio_sampling_rate} --reference_image_path {ref_img} --audio_path {audio} --kps_path {kps_path} \
+        --num_pad_audio_frames {num_pad_audio_frames} --standard_audio_sampling_rate {standard_audio_sampling_rate} --reference_image_path {ref_img} --audio_path {audio} --kps_path {kps_path if kps_path else 'None'} \
         --output_path {output_path} --image_width {image_width} --image_height {image_height} --fps {fps} --seed {seed} --num_inference_steps {num_inference_steps} --guidance_scale {guidance_scale} \
         --context_frames {context_frames} --context_stride {context_stride} --context_overlap {context_overlap} --reference_attention_weight {reference_attention_weight} --audio_attention_weight {audio_attention_weight}"
         print(vexprss_cmd)
         os.system(vexprss_cmd)
         return (output_path,)
 
+class LoadAudio:
+    @classmethod
+    def INPUT_TYPES(s):
+        files = [f for f in os.listdir(input_path) if os.path.isfile(os.path.join(input_path, f)) and f.split('.')[-1] in ["wav", "mp3","WAV","flac","m4a"]]
+        return {"required":
+                    {"audio": (sorted(files),)},
+                }
+
+    CATEGORY = "AIFSH_VExpress"
+
+    RETURN_TYPES = ("AUDIO",)
+    FUNCTION = "load_audio"
+
+    def load_audio(self, audio):
+        audio_path = folder_paths.get_annotated_filepath(audio)
+        return (audio_path,)
 
 class LoadImagePath:
     @classmethod
