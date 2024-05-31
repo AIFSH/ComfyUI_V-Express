@@ -86,8 +86,7 @@ def save_video(video_tensor, audio_path, output_path, fps=30.0):
     cmd = (f'{get_ffmpeg_exe()} -i "{temp_output_path}" -i "{audio_path}" '
            f'-map 0:v -map 1:a -c:v h264 -shortest -y "{output_path}" -loglevel quiet')
     os.system(cmd)
-    import shutil
-    shutil.remove(temp_output_path)
+    os.remove(temp_output_path)
     # os.system(f'rm -rf "{temp_output_path}"')
 
 
