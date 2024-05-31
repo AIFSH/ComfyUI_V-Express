@@ -31,9 +31,6 @@ class VExpress:
             "required": {
                 "ref_img":("IMAGE",),
                 "audio": ("AUDIO",),
-                "output_path": ("STRING",{
-                    "default": os.path.join(out_path,f"{time.time()}_vexpress.mp4")
-                }),
                 "retarget_strategy":(["fix_face", "no_retarget", "offset_retarget", "naive_retarget"],{
                     "default": "fix_face"
                 }),
@@ -100,7 +97,7 @@ class VExpress:
 
     FUNCTION = "process"
 
-    def process(self,ref_img,audio,output_path,retarget_strategy,device,
+    def process(self,ref_img,audio,retarget_strategy,device,
                 gpu_id,dtype,num_pad_audio_frames,standard_audio_sampling_rate,
                 image_width,image_height,fps,seed,num_inference_steps,guidance_scale,
                 context_frames,context_stride,context_overlap,reference_attention_weight,
@@ -108,7 +105,7 @@ class VExpress:
         python_exec = sys.executable or "python"
         parent_directory = os.path.join(now_dir,"V_Express")
         # todo autoclip image and video to 512
-        
+        output_path = os.path.join(out_path,f"{time.time()}_vexpress.mp4")
         if target_video:
             kps_path = os.path.join(input_path,os.path.basename(target_video)[:-4]+"_kps.pth")
             audio_save_path = os.path.join(input_path,os.path.basename(target_video)[:-4]+"_aud.mp3")
