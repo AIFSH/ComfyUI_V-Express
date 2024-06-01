@@ -113,6 +113,7 @@ class VExpress:
             --audio_save_path {audio_save_path} --device {device} --gpu_id {gpu_id} --insightface_model_path {insightface_model_path} --height {image_height} --width {image_width}"
             os.system(fps_cmd)
         else:
+            retarget_strategy = "fix_face"
             kps_path = None
         
         vexprss_cmd = f"{python_exec} {parent_directory}/inference.py --unet_config_path {unet_config_path} --vae_path {vae_path} --audio_encoder_path {audio_encoder_path} \
