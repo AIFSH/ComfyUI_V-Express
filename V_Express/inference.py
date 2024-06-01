@@ -1,6 +1,6 @@
 import argparse
 
-import os
+import os,sys
 import cv2
 import numpy as np
 import torch
@@ -184,8 +184,8 @@ def main():
     ).to(dtype=dtype, device=device)
 
     app = FaceAnalysis(
-        providers=['CUDAExecutionProvider' if args.device == 'cuda' else 'CPUExecutionProvider'],
-        provider_options=[{'device_id': args.gpu_id}] if args.device == 'cuda' else [],
+        providers=['CUDAExecutionProvider' if args.device == 'cuda' and sys.platform != "win32" else 'CPUExecutionProvider'],
+        provider_options=[{'device_id': args.gpu_id}] if args.device == 'cuda' and sys.platform != "win32" else [],
         root=args.insightface_model_path,
     )
     app.prepare(ctx_id=0, det_size=(args.image_height, args.image_width))
