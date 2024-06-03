@@ -1,6 +1,7 @@
 import argparse
 
-import os,sys
+import os
+import sys
 import cv2
 import numpy as np
 import torch
@@ -18,8 +19,8 @@ from modules import UNet2DConditionModel, UNet3DConditionModel, VKpsGuider, Audi
 from pipelines import VExpressPipeline
 from pipelines.utils import draw_kps_image, save_video
 from pipelines.utils import retarget_kps
-now_dir = os.path.dirname(os.path.abspath(__file__))
-inference_config_path = os.path.join(now_dir,"inference_v2.yaml")
+
+
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -53,7 +54,7 @@ def parse_args():
     parser.add_argument('--image_height', type=int, default=512)
     parser.add_argument('--fps', type=float, default=30.0)
     parser.add_argument('--seed', type=int, default=42)
-    parser.add_argument('--num_inference_steps', type=int, default=30)
+    parser.add_argument('--num_inference_steps', type=int, default=25)
     parser.add_argument('--guidance_scale', type=float, default=3.5)
     parser.add_argument('--context_frames', type=int, default=12)
     parser.add_argument('--context_stride', type=int, default=1)
@@ -73,8 +74,7 @@ def load_reference_net(unet_config_path, reference_net_path, dtype, device):
     return reference_net
 
 
-def load_denoising_unet(unet_config_path, denoising_unet_path, motion_module_path, dtype, device):
-    # inference_config_path = './inference_v2.yaml'
+def load_denoising_unet(inference_config_path, unet_config_path, denoising_unet_path, motion_module_path, dtype, device):
     inference_config = OmegaConf.load(inference_config_path)
     denoising_unet = UNet3DConditionModel.from_config_2d(
         unet_config_path,
@@ -122,8 +122,7 @@ def load_audio_projection(
     return audio_projection
 
 
-def get_scheduler():
-    # inference_config_path = './inference_v2.yaml'
+def get_scheduler(inference_config_path):
     inference_config = OmegaConf.load(inference_config_path)
     scheduler_kwargs = OmegaConf.to_container(inference_config.noise_scheduler_kwargs)
     scheduler = DDIMScheduler(**scheduler_kwargs)
@@ -150,9 +149,15 @@ def main():
     audio_projection_path = args.audio_projection_path
     motion_module_path = args.motion_module_path
 
-    scheduler = get_scheduler()
+    # inference_config_path = './inference_v2.yaml'
+    now_dir = os.path.dirname(os.path.abspath(__file__))
+    inference_config_path = os.path.join(now_dir,"inference_v2.yaml")
+    scheduler = get_scheduler(inference_config_path)
     reference_net = load_reference_net(unet_config_path, reference_net_path, dtype, device)
-    denoising_unet = load_denoising_unet(unet_config_path, denoising_unet_path, motion_module_path, dtype, device)
+    denoising_unet = load_denoising_unet(
+        inference_config_path, unet_config_path, denoising_unet_path, motion_module_path,
+        dtype, device
+    )
     v_kps_guider = load_v_kps_guider(v_kps_guider_path, dtype, device)
     audio_projection = load_audio_projection(
         audio_projection_path,
@@ -194,7 +199,7 @@ def main():
     reference_image = reference_image.resize((args.image_height, args.image_width))
 
     reference_image_for_kps = cv2.imread(args.reference_image_path)
-    reference_image_for_kps = cv2.resize(reference_image_for_kps, (args.image_height, args.image_width))
+    reference_image_for_kps = cv2.resize(reference_image_for_kps, (args.image_width, args.image_height))
     reference_kps = app.get(reference_image_for_kps)[0].kps[:3]
 
     _, audio_waveform, meta_info = torchvision.io.read_video(args.audio_path, pts_unit='sec')
@@ -212,7 +217,7 @@ def main():
     video_length = int(duration * args.fps)
     print(f'The corresponding video length is {video_length}.')
 
-    if args.kps_path != "None":
+    if args.kps_path != "":
         assert os.path.exists(args.kps_path), f'{args.kps_path} does not exist'
         kps_sequence = torch.tensor(torch.load(args.kps_path))  # [len, 3, 2]
         print(f'The original length of kps sequence is {kps_sequence.shape[0]}.')

@@ -1,4 +1,4 @@
-diffusers==0.24.0
+diffusers
 av
 pydub
 moviepy
