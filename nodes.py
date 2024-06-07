@@ -129,7 +129,7 @@ class VExpress:
 class LoadAudio:
     @classmethod
     def INPUT_TYPES(s):
-        files = [f for f in os.listdir(input_path) if os.path.isfile(os.path.join(input_path, f)) and f.split('.')[-1] in ["wav", "mp3","WAV","flac","m4a"]]
+        files = [f for f in os.listdir(input_path) if os.path.isfile(os.path.join(input_path, f)) and f.split('.')[-1].lower() in ["wav", "mp3","WAV","flac","m4a"]]
         return {"required":
                     {"audio": (sorted(files),)},
                 }
