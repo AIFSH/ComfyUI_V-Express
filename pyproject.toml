@@ -1,0 +1,15 @@
+[project]
+name = "comfyui_v-express"
+description = "the comfyui custom node of [a/V-Express](https://github.com/tencent-ailab/V-Express) to make audio driven videos!"
+version = "1.0.0"
+license = "LICENSE"
+dependencies = ["diffusers", "av", "pydub", "moviepy", "imageio-ffmpeg", "onnxruntime-gpu", "einops", "insightface", "omegaconf", "safetensors", "tqdm"]
+
+[project.urls]
+Repository = "https://github.com/AIFSH/ComfyUI_V-Express"
+#  Used by Comfy Registry https://comfyregistry.org
+
+[tool.comfy]
+PublisherId = ""
+DisplayName = "ComfyUI_V-Express"
+Icon = ""
