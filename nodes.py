@@ -29,10 +29,10 @@ class VExpress:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "ref_img":("IMAGE",),
-                "audio": ("AUDIO",),
+                "ref_img":("IMAGEPATH",),
+                "audio": ("AUDIOPATH",),
                 "retarget_strategy":(["fix_face", "no_retarget", "offset_retarget", "naive_retarget"],{
-                    "default": "fix_face"
+                    "default": "naive_retarget"
                 }),
                 "device": ("STRING",{
                     "default": "cuda"
@@ -62,16 +62,13 @@ class VExpress:
                     "default": 42
                 }),
                 "num_inference_steps": ("INT",{
-                    "default": 30
+                    "default": 25
                 }),
                 "guidance_scale": ("FLOAT",{
                     "default": 3.5
                 }),
                 "context_frames": ("INT",{
                     "default": 12
-                }),
-                "context_stride": ("INT",{
-                    "default": 1
                 }),
                 "context_overlap": ("INT",{
                     "default": 4
@@ -100,7 +97,7 @@ class VExpress:
     def process(self,ref_img,audio,retarget_strategy,device,
                 gpu_id,dtype,num_pad_audio_frames,standard_audio_sampling_rate,
                 image_width,image_height,fps,seed,num_inference_steps,guidance_scale,
-                context_frames,context_stride,context_overlap,reference_attention_weight,
+                context_frames,context_overlap,reference_attention_weight,
                audio_attention_weight,target_video=None):
         python_exec = sys.executable or "python"
         parent_directory = os.path.join(now_dir,"V_Express")
@@ -121,12 +118,12 @@ class VExpress:
         --audio_projection_path {audio_projection_path} --motion_module_path {motion_module_path} --retarget_strategy {retarget_strategy} --device {device} --gpu_id {gpu_id} --dtype {dtype} \
         --num_pad_audio_frames {num_pad_audio_frames} --standard_audio_sampling_rate {standard_audio_sampling_rate} --reference_image_path {ref_img} --audio_path {audio} --kps_path {kps_path if kps_path else 'None'} \
         --output_path {output_path} --image_width {image_width} --image_height {image_height} --fps {fps} --seed {seed} --num_inference_steps {num_inference_steps} --guidance_scale {guidance_scale} \
-        --context_frames {context_frames} --context_stride {context_stride} --context_overlap {context_overlap} --reference_attention_weight {reference_attention_weight} --audio_attention_weight {audio_attention_weight}"
+        --context_frames {context_frames} --context_overlap {context_overlap} --reference_attention_weight {reference_attention_weight} --audio_attention_weight {audio_attention_weight}"
         print(vexprss_cmd)
         os.system(vexprss_cmd)
         return (output_path,)
 
-class LoadAudio:
+class LoadAudioPath:
     @classmethod
     def INPUT_TYPES(s):
         files = [f for f in os.listdir(input_path) if os.path.isfile(os.path.join(input_path, f)) and f.split('.')[-1].lower() in ["wav", "mp3","WAV","flac","m4a"]]
@@ -136,7 +133,7 @@ class LoadAudio:
 
     CATEGORY = "AIFSH_VExpress"
 
-    RETURN_TYPES = ("AUDIO",)
+    RETURN_TYPES = ("AUDIOPATH",)
     FUNCTION = "load_audio"
 
     def load_audio(self, audio):
@@ -147,52 +144,19 @@ class LoadImagePath:
     @classmethod
     def INPUT_TYPES(s):
         input_dir = folder_paths.get_input_directory()
-        files = [f for f in os.listdir(input_dir) if os.path.isfile(os.path.join(input_dir, f))]
+        files = [f for f in os.listdir(input_dir) if os.path.isfile(os.path.join(input_dir, f)) and f.split('.')[-1].lower() in ['bmp','jpg','png','webp','jpeg']]
         return {"required":
                     {"image": (sorted(files), {"image_upload": True})},
                 }
 
     CATEGORY = "AIFSH_VExpress"
 
-    RETURN_TYPES = ("IMAGE",)
+    RETURN_TYPES = ("IMAGEPATH",)
     FUNCTION = "load_image"
     def load_image(self, image):
         image_path = folder_paths.get_annotated_filepath(image)
         return (image_path,)
     
-class CombineAudioVideo:
-    @classmethod
-    def INPUT_TYPES(s):
-        return {"required":
-                    {"vocal_AUDIO": ("AUDIO",),
-                     "bgm_AUDIO": ("AUDIO",),
-                     "video": ("VIDEO",)
-                    }
-                }
-
-    CATEGORY = "AIFSH_VExpress"
-    DESCRIPTION = "hello world!"
-
-    RETURN_TYPES = ("VIDEO",)
-
-    OUTPUT_NODE = False
-
-    FUNCTION = "combine"
-
-    def combine(self, vocal_AUDIO,bgm_AUDIO,video):
-        vocal = AudioSegment.from_file(vocal_AUDIO)
-        bgm = AudioSegment.from_file(bgm_AUDIO)
-        audio = vocal.overlay(bgm)
-        audio_file = os.path.join(out_path,"ip_lap_voice.wav")
-        audio.export(audio_file, format="wav")
-        cm_video_file = os.path.join(out_path,"voice_"+os.path.basename(video))
-        video_clip = VideoFileClip(video)
-        audio_clip = AudioFileClip(audio_file)
-        new_video_clip = video_clip.set_audio(audio_clip)
-        new_video_clip.write_videofile(cm_video_file)
-        return (cm_video_file,)
-
-
 class PreViewVideo:
     @classmethod
     def INPUT_TYPES(s):
@@ -225,7 +189,7 @@ class LoadVideo:
     CATEGORY = "AIFSH_VExpress"
     DESCRIPTION = "hello world!"
 
-    RETURN_TYPES = ("VIDEO","AUDIO")
+    RETURN_TYPES = ("VIDEO","AUDIOPATH")
 
     OUTPUT_NODE = False
 

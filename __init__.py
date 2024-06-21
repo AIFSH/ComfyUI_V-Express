@@ -32,15 +32,14 @@ if not os.path.isfile(os.path.join(now_dir,"model_ckpts","v-express","v_kps_guid
 else:
     print("V-Express use cache models,make sure your 'model_ckpts' complete")
 
-from .nodes import LoadVideo,PreViewVideo,CombineAudioVideo,VExpress,LoadImagePath, LoadAudio
+from .nodes import LoadVideo,PreViewVideo,VExpress,LoadImagePath, LoadAudioPath
 WEB_DIRECTORY = "./web"
 # A dictionary that contains all nodes you want to export with their names
 # NOTE: names should be globally unique
 NODE_CLASS_MAPPINGS = {
-    "LoadAudio": LoadAudio,
+    "LoadAudioPath": LoadAudioPath,
     "LoadVideo": LoadVideo,
     "PreViewVideo": PreViewVideo,
-    "CombineAudioVideo": CombineAudioVideo,
     "VExpress": VExpress,
     "LoadImagePath": LoadImagePath
 }
@@ -50,7 +49,6 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VExpress": "VExpress Node",
     "LoadVideo": "Video Loader",
     "PreViewVideo": "PreView Video",
-    "CombineAudioVideo": "Combine Audio Video",
     "LoadImagePath": "LoadImagePath",
-    "LoadAudio": "AudioLoader"
+    "LoadAudioPath": "LoadAudioPath"
 }
