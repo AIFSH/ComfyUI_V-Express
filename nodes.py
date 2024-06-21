@@ -99,6 +99,16 @@ class VExpress:
                 image_width,image_height,fps,seed,num_inference_steps,guidance_scale,
                 context_frames,context_overlap,reference_attention_weight,
                audio_attention_weight,target_video=None):
+        if audio[-3:] != "mp3":
+            audio_seg = AudioSegment.from_file(audio)
+            audio_path = audio.split(".")[:-1] + ["mp3"]
+            audio_path = ".".join(audio_path)
+            audio_seg.export(audio_path,format="mp3")
+        else:
+            audio_path = audio
+        
+        print(audio_path)
+            
         python_exec = sys.executable or "python"
         parent_directory = os.path.join(now_dir,"V_Express")
         # todo autoclip image and video to 512
@@ -106,19 +116,19 @@ class VExpress:
         if target_video:
             kps_path = os.path.join(input_path,os.path.basename(target_video)[:-4]+"_kps.pth")
             audio_save_path = os.path.join(input_path,os.path.basename(target_video)[:-4]+"_aud.mp3")
-            fps_cmd = f"{python_exec} {parent_directory}/scripts/extract_kps_sequence_and_audio.py --video_path {target_video} --kps_sequence_save_path {kps_path} \
-            --audio_save_path {audio_save_path} --device {device} --gpu_id {gpu_id} --insightface_model_path {insightface_model_path} --height {image_height} --width {image_width}"
+            fps_cmd = f"""{python_exec} {parent_directory}/scripts/extract_kps_sequence_and_audio.py --video_path "{target_video}" --kps_sequence_save_path {kps_path} \
+            --audio_save_path {audio_save_path} --device {device} --gpu_id {gpu_id} --insightface_model_path {insightface_model_path} --height {image_height} --width {image_width}"""
             os.system(fps_cmd)
         else:
             retarget_strategy = "fix_face"
             kps_path = None
         
-        vexprss_cmd = f"{python_exec} {parent_directory}/inference.py --unet_config_path {unet_config_path} --vae_path {vae_path} --audio_encoder_path {audio_encoder_path} \
+        vexprss_cmd = f"""{python_exec} {parent_directory}/inference.py --unet_config_path {unet_config_path} --vae_path {vae_path} --audio_encoder_path {audio_encoder_path} \
         --insightface_model_path {insightface_model_path} --denoising_unet_path {denoising_unet_path} --reference_net_path {reference_net_path} --v_kps_guider_path {v_kps_guider_path} \
         --audio_projection_path {audio_projection_path} --motion_module_path {motion_module_path} --retarget_strategy {retarget_strategy} --device {device} --gpu_id {gpu_id} --dtype {dtype} \
-        --num_pad_audio_frames {num_pad_audio_frames} --standard_audio_sampling_rate {standard_audio_sampling_rate} --reference_image_path {ref_img} --audio_path {audio} --kps_path {kps_path if kps_path else 'None'} \
+        --num_pad_audio_frames {num_pad_audio_frames} --standard_audio_sampling_rate {standard_audio_sampling_rate} --reference_image_path "{ref_img}" --audio_path "{audio_path}" --kps_path "{kps_path if kps_path else 'None'}" \
         --output_path {output_path} --image_width {image_width} --image_height {image_height} --fps {fps} --seed {seed} --num_inference_steps {num_inference_steps} --guidance_scale {guidance_scale} \
-        --context_frames {context_frames} --context_overlap {context_overlap} --reference_attention_weight {reference_attention_weight} --audio_attention_weight {audio_attention_weight}"
+        --context_frames {context_frames} --context_overlap {context_overlap} --reference_attention_weight {reference_attention_weight} --audio_attention_weight {audio_attention_weight}"""
         print(vexprss_cmd)
         os.system(vexprss_cmd)
         return (output_path,)
