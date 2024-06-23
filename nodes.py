@@ -18,11 +18,11 @@ audio_encoder_path = os.path.join(model_path,"wav2vec2-base-960h")
 insightface_model_path = os.path.join(model_path,"insightface_models")
 
 vexpress_path = os.path.join(model_path,"v-express")
-denoising_unet_path = os.path.join(vexpress_path,"denoising_unet.pth")
-reference_net_path = os.path.join(vexpress_path,"reference_net.pth")
-v_kps_guider_path = os.path.join(vexpress_path,"v_kps_guider.pth")
-audio_projection_path = os.path.join(vexpress_path,"audio_projection.pth")
-motion_module_path = os.path.join(vexpress_path,"motion_module.pth")
+denoising_unet_path = os.path.join(vexpress_path,"denoising_unet.bin")
+reference_net_path = os.path.join(vexpress_path,"reference_net.bin")
+v_kps_guider_path = os.path.join(vexpress_path,"v_kps_guider.bin")
+audio_projection_path = os.path.join(vexpress_path,"audio_projection.bin")
+motion_module_path = os.path.join(vexpress_path,"motion_module.bin")
 
 class VExpress:
     @classmethod
